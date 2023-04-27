@@ -219,27 +219,20 @@ class MyHandler(BaseHTTPRequestHandler):
             except subprocess.CalledProcessError as e:
                 self.send_error(500, message=str(e))
 
-        # TCP连接详情
-        elif self.path == '/test':
+        # 主动TCP连接
+        elif self.path == '/activeTCP':
             if os.getuid() != 0:
                 self.send_error(401, message='Permission denied')
                 return
             try:
-                command = 'python3 /home/hanqihua/bcc/tools/tcpconnect.py'
-                process = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
                 self.send_response(200)
-                self.send_header('Content-type', 'text/plain')
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
-                while True:
-                    output = process.stdout.readline().decode()
-                    if output == '' and process.poll() is not None:
-                        break
-                    if output:
-                        if (output.split()[0].isdigit()):
-                            curTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-                            output = curTime + ' ' + output
-                            self.wfile.write(output.strip().encode() + b'\n')
-                            self.wfile.flush()                  
+                cursor.execute("SELECT curTime, pid, comm, ip, saddr, daddr, port FROM activeTCP ORDER BY curTime DESC LIMIT 20;")
+                data = cursor.fetchall()
+                self.wfile.write(json.dumps(data).encode())
+                self.wfile.flush()
             except subprocess.CalledProcessError as e:
                 self.send_error(500, message=str(e))
 

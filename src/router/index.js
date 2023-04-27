@@ -14,7 +14,7 @@ import POP from '../views/email/POP.vue'
 import IMAP from '../views/email/IMAP.vue'
 import DiskUsage from '../views/disk/diskUsage.vue'
 import FaultDiagnosisFind from '../views/FaultDiagnosis/FaultDiagnosisFind.vue'
-import TCP from '../views/network/TCP.vue'
+import activeTCP from '../views/network/activeTCP.vue'
 
 Vue.use(VueRouter)
 
@@ -92,9 +92,9 @@ const routes = [
     redirect: '/home',
     children: [
       {
-        path: '/TCP',
-        name: 'TCP连接信息',
-        component: TCP
+        path: '/activeTCP',
+        name: '主动TCP连接',
+        component: activeTCP
       }
     ]
   },
