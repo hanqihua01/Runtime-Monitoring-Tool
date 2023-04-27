@@ -15,6 +15,7 @@ import IMAP from '../views/email/IMAP.vue'
 import DiskUsage from '../views/disk/diskUsage.vue'
 import FaultDiagnosisFind from '../views/FaultDiagnosis/FaultDiagnosisFind.vue'
 import activeTCP from '../views/network/activeTCP.vue'
+import passiveTCP from '../views/network/passiveTCP.vue'
 
 Vue.use(VueRouter)
 
@@ -95,6 +96,11 @@ const routes = [
         path: '/activeTCP',
         name: '主动TCP连接',
         component: activeTCP
+      },
+      {
+        path: '/passiveTCP',
+        name: '被动TCP连接',
+        component: passiveTCP
       }
     ]
   },

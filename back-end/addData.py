@@ -170,6 +170,35 @@ class MyHandler():
                     self.cursor.execute(sqlStr, data)
                     self.db.commit()
                     print(self.cursor.rowcount, "record inserted.")
+                
+    # 被动TCP连接
+    def passiveTCP(self):
+        command = 'python3 /home/hanqihua/bcc/tools/tcpaccept.py'
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
+        while True:
+            output = process.stdout.readline().decode()
+            if output == '' and process.poll() is not None:
+                print('passiveTCP()函数执行结束')
+                break
+            if output:
+                output = output[:-1]
+                outputList = output.split()
+                if (outputList[0].isdigit()):
+                    curTime = time.strftime(
+                        '%Y-%m-%d %H:%M:%S', time.localtime())
+                    pid = outputList[0]
+                    comm = ' '.join(outputList[1:-5])
+                    ip = outputList[-5]
+                    raddr = outputList[-4]
+                    rport = outputList[-3]
+                    laddr = outputList[-2]
+                    lport = outputList[-1]
+                    print(curTime + ": Executing passiveTCP(): ", end='')
+                    sqlStr = "INSERT INTO passiveTCP (curTime, pid, comm, ip, raddr, rport, laddr, lport) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
+                    data = (curTime, pid, comm, ip, raddr, rport, laddr, lport)
+                    self.cursor.execute(sqlStr, data)
+                    self.db.commit()
+                    print(self.cursor.rowcount, "record inserted.")        
 
 if __name__ == '__main__':
     os.setuid(0)
@@ -177,6 +206,9 @@ if __name__ == '__main__':
 
     activeTCPProcess = multiprocessing.Process(target=myHandler.activeTCP)
     activeTCPProcess.start()
+
+    passiveTCPProcess = multiprocessing.Process(target=myHandler.passiveTCP)
+    passiveTCPProcess.start()
 
     while(True):
         myHandler.processCount()

@@ -236,5 +236,22 @@ class MyHandler(BaseHTTPRequestHandler):
             except subprocess.CalledProcessError as e:
                 self.send_error(500, message=str(e))
 
+        # 被动TCP连接
+        elif self.path == '/passiveTCP':
+            if os.getuid() != 0:
+                self.send_error(401, message='Permission denied')
+                return
+            try:
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                cursor.execute("SELECT curTime, pid, comm, ip, raddr, rport, laddr, lport FROM passiveTCP ORDER BY curTime DESC LIMIT 20;")
+                data = cursor.fetchall()
+                self.wfile.write(json.dumps(data).encode())
+                self.wfile.flush()
+            except subprocess.CalledProcessError as e:
+                self.send_error(500, message=str(e))        
+
         cursor.close()
         db.close()
