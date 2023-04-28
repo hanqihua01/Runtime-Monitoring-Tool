@@ -251,7 +251,75 @@ class MyHandler(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps(data).encode())
                 self.wfile.flush()
             except subprocess.CalledProcessError as e:
-                self.send_error(500, message=str(e))        
+                self.send_error(500, message=str(e))
+
+        # TCP断开连接
+        elif self.path == '/tcpClose':
+            if os.getuid() != 0:
+                self.send_error(401, message='Permission denied')
+                return
+            try:
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                cursor.execute("SELECT curTime, pid, comm, ip, saddr, daddr, sport, dport FROM tcpClose ORDER BY curTime DESC LIMIT 20;")
+                data = cursor.fetchall()
+                self.wfile.write(json.dumps(data).encode())
+                self.wfile.flush()
+            except subprocess.CalledProcessError as e:
+                self.send_error(500, message=str(e))
+
+        # 线程创建
+        elif self.path == '/threadSnoop':
+            if os.getuid() != 0:
+                self.send_error(401, message='Permission denied')
+                return
+            try:
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                cursor.execute("SELECT curTime, pid, comm, func FROM threadSnoop ORDER BY curTime DESC LIMIT 20;")
+                data = cursor.fetchall()
+                self.wfile.write(json.dumps(data).encode())
+                self.wfile.flush()
+            except subprocess.CalledProcessError as e:
+                self.send_error(500, message=str(e))
+
+        # TCP连接延迟
+        elif self.path == '/tcpConnLat':
+            if os.getuid() != 0:
+                self.send_error(401, message='Permission denied')
+                return
+            try:
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                cursor.execute("SELECT curTime, pid, comm, ip, saddr, daddr, dport, lat FROM tcpConnLat ORDER BY curTime DESC LIMIT 20;")
+                data = cursor.fetchall()
+                self.wfile.write(json.dumps(data).encode())
+                self.wfile.flush()
+            except subprocess.CalledProcessError as e:
+                self.send_error(500, message=str(e))
+
+        # TCP传输数据大小建立连接时长
+        elif self.path == '/tcpLife':
+            if os.getuid() != 0:
+                self.send_error(401, message='Permission denied')
+                return
+            try:
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                cursor.execute("SELECT curTime, pid, comm, laddr, lport, raddr, rport, tx, rx, ms FROM tcpLife ORDER BY curTime DESC LIMIT 20;")
+                data = cursor.fetchall()
+                self.wfile.write(json.dumps(data).encode())
+                self.wfile.flush()
+            except subprocess.CalledProcessError as e:
+                self.send_error(500, message=str(e))
 
         cursor.close()
         db.close()

@@ -16,6 +16,10 @@ import DiskUsage from '../views/disk/diskUsage.vue'
 import FaultDiagnosisFind from '../views/FaultDiagnosis/FaultDiagnosisFind.vue'
 import activeTCP from '../views/network/activeTCP.vue'
 import passiveTCP from '../views/network/passiveTCP.vue'
+import ThreadSnoop from '../views/process/ThreadSnoop.vue'
+import tcpClose from '../views/network/tcpClose.vue'
+import tcpConnLat from '../views/network/tcpConnLat'
+import tcpLife from '../views/network/tcpLife'
 
 Vue.use(VueRouter)
 
@@ -49,6 +53,11 @@ const routes = [
         path: '/ProcessCount',
         name: '进程数量',
         component: ProcessCount
+      },
+      {
+        path: '/ThreadSnoop',
+        name: '线程创建',
+        component: ThreadSnoop
       }
     ]
   },
@@ -101,6 +110,21 @@ const routes = [
         path: '/passiveTCP',
         name: '被动TCP连接',
         component: passiveTCP
+      },
+      {
+        path: '/tcpConnLat',
+        name: 'TCP连接延迟',
+        component: tcpConnLat
+      },
+      {
+        path: '/tcpLife',
+        name: 'TCP数据大小与时长',
+        component: tcpLife
+      },
+      {
+        path: '/tcpClose',
+        name: 'TCP断开连接',
+        component: tcpClose
       }
     ]
   },

@@ -1,8 +1,10 @@
 import os
+import pty
 import time
 import pymysql
 import subprocess
 import multiprocessing
+
 
 class MyHandler():
     '''
@@ -170,7 +172,7 @@ class MyHandler():
                     self.cursor.execute(sqlStr, data)
                     self.db.commit()
                     print(self.cursor.rowcount, "record inserted.")
-                
+
     # 被动TCP连接
     def passiveTCP(self):
         command = 'python3 /home/hanqihua/bcc/tools/tcpaccept.py'
@@ -198,25 +200,163 @@ class MyHandler():
                     data = (curTime, pid, comm, ip, raddr, rport, laddr, lport)
                     self.cursor.execute(sqlStr, data)
                     self.db.commit()
-                    print(self.cursor.rowcount, "record inserted.")        
+                    print(self.cursor.rowcount, "record inserted.")
+
+    # TCP断开连接
+    def tcpClose(self):
+        cmd = 'python3 /home/hanqihua/bcc/tools/tcptracer.py'
+        master, slave = pty.openpty()
+        p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE,
+                             stdout=slave, stderr=subprocess.STDOUT)
+        while True:
+            output = os.read(master, 1024).decode('utf-8')
+            if output == '':
+                break
+            outputList = output[:-1].split()
+            if (outputList[0] == 'X'):
+                curTime = time.strftime(
+                    '%Y-%m-%d %H:%M:%S', time.localtime())
+                pid = outputList[1]
+                commList = outputList[2:-5]
+                if len(commList) <= 2:
+                    comm = ' '.join(commList)
+                else:
+                    comm = ' '.join(commList[0:2])
+                ip = outputList[-5]
+                saddr = outputList[-4]
+                daddr = outputList[-3]
+                sport = outputList[-2]
+                dport = outputList[-1]
+                data = (curTime, pid, comm, ip, saddr, daddr, sport, dport)
+                print(curTime + ": Executing tcpClose(): ", end='')
+                sqlStr = "INSERT INTO tcpClose (curTime, pid, comm, ip, saddr, daddr, sport, dport) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
+                self.cursor.execute(sqlStr, data)
+                self.db.commit()
+                print(self.cursor.rowcount, "record inserted.")
+
+    # TCP连接延迟
+    def tcpConnLat(self):
+        cmd = 'python3 /home/hanqihua/bcc/tools/tcpconnlat.py'
+        master, slave = pty.openpty()
+        p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE,
+                             stdout=slave, stderr=subprocess.STDOUT)
+        while True:
+            output = os.read(master, 1024).decode('utf-8')
+            if output == '':
+                break
+            outputList = output[:-1].split()
+            if (outputList[0].isdigit()):
+                curTime = time.strftime(
+                    '%Y-%m-%d %H:%M:%S', time.localtime())
+                pid = outputList[0]
+                commList = outputList[1:-5]
+                if len(commList) <= 2:
+                    comm = ' '.join(commList)
+                else:
+                    comm = ' '.join(commList[0:2])
+                ip = outputList[-5]
+                saddr = outputList[-4]
+                daddr = outputList[-3]
+                dport = outputList[-2]
+                lat = outputList[-1]
+                data = (curTime, pid, comm, ip, saddr, daddr, dport, lat)
+                print(curTime + ": Executing tcpConnLat(): ", end='')
+                sqlStr = "INSERT INTO tcpConnLat (curTime, pid, comm, ip, saddr, daddr, dport, lat) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
+                self.cursor.execute(sqlStr, data)
+                self.db.commit()
+                print(self.cursor.rowcount, "record inserted.")
+
+    # 线程创建
+    def threadSnoop(self):
+        command = 'python3 /home/hanqihua/bcc/tools/threadsnoop.py'
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
+        while True:
+            output = process.stdout.readline().decode()
+            if output == '' and process.poll() is not None:
+                print('threadsnoop()函数执行结束')
+                break
+            if output:
+                output = output[:-1]
+                outputList = output.split()
+                if (outputList[0].isdigit()):
+                    curTime = time.strftime(
+                        '%Y-%m-%d %H:%M:%S', time.localtime())
+                    pid = outputList[1]
+                    comm = ' '.join(outputList[2:-1])
+                    func = outputList[-1]
+                    print(curTime + ": Executing threadSnoop(): ", end='')
+                    sqlStr = "INSERT INTO threadSnoop (curTime, pid, comm, func) VALUES (%s, %s, %s, %s);"
+                    data = (curTime, pid, comm, func)
+                    self.cursor.execute(sqlStr, data)
+                    self.db.commit()
+                    print(self.cursor.rowcount, "record inserted.")
+
+    # TCP连接延迟
+    def tcpLife(self):
+        cmd = 'python3 /home/hanqihua/bcc/tools/tcplife.py'
+        master, slave = pty.openpty()
+        p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE,
+                             stdout=slave, stderr=subprocess.STDOUT)
+        while True:
+            output = os.read(master, 1024).decode('utf-8')
+            if output == '':
+                break
+            outputList = output[:-1].split()
+            if (outputList[0].isdigit()):
+                curTime = time.strftime(
+                    '%Y-%m-%d %H:%M:%S', time.localtime())
+                pid = outputList[0]
+                commList = outputList[1:-7]
+                if len(commList) <= 2:
+                    comm = ' '.join(commList)
+                else:
+                    comm = ' '.join(commList[0:2])
+                laddr = outputList[-7]
+                lport = outputList[-6]
+                raddr = outputList[-5]
+                rport = outputList[-4]
+                tx = outputList[-3]
+                rx = outputList[-2]
+                ms = outputList[-1]
+                data = (curTime, pid, comm, laddr, lport, raddr, rport, tx, rx, ms)
+                print(curTime + ": Executing tcpLife(): ", end='')
+                sqlStr = "INSERT INTO tcpLife (curTime, pid, comm, laddr, lport, raddr, rport, tx, rx, ms) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+                self.cursor.execute(sqlStr, data)
+                self.db.commit()
+                print(self.cursor.rowcount, "record inserted.")
+
+    # CPU调度延迟
+    
 
 if __name__ == '__main__':
     os.setuid(0)
     myHandler = MyHandler()
 
-    activeTCPProcess = multiprocessing.Process(target=myHandler.activeTCP)
-    activeTCPProcess.start()
+    # activeTCPProcess = multiprocessing.Process(target=myHandler.activeTCP)
+    # activeTCPProcess.start()
 
-    passiveTCPProcess = multiprocessing.Process(target=myHandler.passiveTCP)
-    passiveTCPProcess.start()
+    # passiveTCPProcess = multiprocessing.Process(target=myHandler.passiveTCP)
+    # passiveTCPProcess.start()
 
-    while(True):
-        myHandler.processCount()
-        myHandler.cpuPercentage()
-        myHandler.residentMemorySize()
-        myHandler.virtualMemorySize()
-        myHandler.jamesStatus()
-        myHandler.smtpStatus()
-        myHandler.popStatus()
-        myHandler.imapStatus()
-        time.sleep(5)
+    # threadSnoopProcess = multiprocessing.Process(target=myHandler.threadSnoop)
+    # threadSnoopProcess.start()
+
+    # tcpCloseProcess = multiprocessing.Process(target=myHandler.tcpClose)
+    # tcpCloseProcess.start()
+
+    # tcpConnLatProcess = multiprocessing.Process(target=myHandler.tcpConnLat)
+    # tcpConnLatProcess.start()
+
+    # tcpLifeProcess = multiprocessing.Process(target=myHandler.tcpLife)
+    # tcpLifeProcess.start()
+
+    # while (True):
+    #     myHandler.processCount()
+    #     myHandler.cpuPercentage()
+    #     myHandler.residentMemorySize()
+    #     myHandler.virtualMemorySize()
+    #     myHandler.jamesStatus()
+    #     myHandler.smtpStatus()
+    #     myHandler.popStatus()
+    #     myHandler.imapStatus()
+    #     time.sleep(5)

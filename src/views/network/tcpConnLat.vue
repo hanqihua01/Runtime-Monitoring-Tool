@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>被动建立的TCP连接：</h1>
+        <h1>TCP连接延迟：</h1>
         <el-table :data="tableData" style="width: 100%" stripe>
             <el-table-column prop="curTime" label="时间" sortable>
             </el-table-column>
@@ -10,13 +10,13 @@
             </el-table-column>
             <el-table-column prop="ip" label="IP版本" sortable>
             </el-table-column>
-            <el-table-column prop="raddr" label="远程地址" sortable>
+            <el-table-column prop="saddr" label="源地址" sortable>
             </el-table-column>
-            <el-table-column prop="rport" label="远程端口" sortable>
+            <el-table-column prop="daddr" label="目的地址" sortable>
             </el-table-column>
-            <el-table-column prop="laddr" label="本地地址" sortable>
+            <el-table-column prop="dport" label="目的端口" sortable>
             </el-table-column>
-            <el-table-column prop="lport" label="本地端口" sortable>
+            <el-table-column prop="lat" label="延迟" sortable>
             </el-table-column>
         </el-table>
     </div>
@@ -33,7 +33,7 @@ export default {
     created() {
         const _this = this
         const getInfo = () => {
-            axios.get('http://localhost:3000/activeTCP')
+            axios.get('http://localhost:3000/tcpConnLat')
                 .then(response => {
                     _this.tableData.length = 0
                     const retList = response.data
@@ -42,19 +42,19 @@ export default {
                         const pid = retList[i][1]
                         const comm = retList[i][2]
                         const ip = retList[i][3]
-                        const raddr = retList[i][4]
-                        const rport = retList[i][5]
-                        const laddr = retList[i][6]
-                        const lport = retList[i][7]
+                        const saddr = retList[i][4]
+                        const daddr = retList[i][5]
+                        const dport = retList[i][6]
+                        const lat = retList[i][7]
                         const newRow = {
                             curTime: curTime,
                             pid: pid,
                             comm: comm,
                             ip: ip,
-                            raddr: raddr,
-                            rport: rport,
-                            laddr: laddr,
-                            lport: lport
+                            saddr: saddr,
+                            daddr: daddr,
+                            dport: dport,
+                            lat: lat
                         }
                         _this.tableData.unshift(newRow)                        
                     }
