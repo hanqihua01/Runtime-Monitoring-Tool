@@ -20,6 +20,8 @@ import ThreadSnoop from '../views/process/ThreadSnoop.vue'
 import tcpClose from '../views/network/tcpClose.vue'
 import tcpConnLat from '../views/network/tcpConnLat'
 import tcpLife from '../views/network/tcpLife'
+import runQSlower from '../views/process/runQSlower'
+import pidPerSec from '../views/process/pidPerSec'
 
 Vue.use(VueRouter)
 
@@ -55,9 +57,19 @@ const routes = [
         component: ProcessCount
       },
       {
+        path: '/pidPerSec',
+        name: '新建进程数量',
+        component: pidPerSec
+      },
+      {
         path: '/ThreadSnoop',
         name: '线程创建',
         component: ThreadSnoop
+      },
+      {
+        path: '/runQSlower',
+        name: '高延迟调度',
+        component: runQSlower
       }
     ]
   },

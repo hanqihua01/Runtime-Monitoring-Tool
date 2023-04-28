@@ -321,5 +321,39 @@ class MyHandler(BaseHTTPRequestHandler):
             except subprocess.CalledProcessError as e:
                 self.send_error(500, message=str(e))
 
+        # CPU调度延迟
+        elif self.path == '/runQSlower':
+            if os.getuid() != 0:
+                self.send_error(401, message='Permission denied')
+                return
+            try:
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                cursor.execute("SELECT time, comm, tid, lat FROM runQSlower ORDER BY time DESC LIMIT 20;")
+                data = cursor.fetchall()
+                self.wfile.write(json.dumps(data).encode())
+                self.wfile.flush()
+            except subprocess.CalledProcessError as e:
+                self.send_error(500, message=str(e))
+
+        # 每秒新创建进程
+        elif self.path == '/pidPerSec':
+            if os.getuid() != 0:
+                self.send_error(401, message='Permission denied')
+                return
+            try:
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                cursor.execute("SELECT time, num FROM pidPerSec ORDER BY time DESC LIMIT 20;")
+                data = cursor.fetchall()
+                self.wfile.write(json.dumps(data).encode())
+                self.wfile.flush()
+            except subprocess.CalledProcessError as e:
+                self.send_error(500, message=str(e))
+
         cursor.close()
         db.close()

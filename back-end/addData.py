@@ -326,7 +326,48 @@ class MyHandler():
                 print(self.cursor.rowcount, "record inserted.")
 
     # CPU调度延迟
-    
+    def runQSlower(self):
+        cmd = 'python3 /home/hanqihua/bcc/tools/runqslower.py'
+        master, slave = pty.openpty()
+        p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE,
+                             stdout=slave, stderr=subprocess.STDOUT)
+        while True:
+            output = os.read(master, 1024).decode('utf-8')
+            if output == '':
+                break
+            outputList = output[:-1].split()
+            if (outputList[0][2] == ':'):
+                time = outputList[0]
+                comm = outputList[1]
+                tid = outputList[2]
+                lat = outputList[3]
+                data = (time, comm, tid, lat)
+                print(time + ": Executing runQSlower(): ", end='')
+                sqlStr = "INSERT INTO runQSlower (time, comm, tid, lat) VALUES (%s, %s, %s, %s);"
+                self.cursor.execute(sqlStr, data)
+                self.db.commit()
+                print(self.cursor.rowcount, "record inserted.")
+
+    # 每秒新创建进程
+    def pidPerSec(self):
+        cmd = 'python3 /home/hanqihua/bcc/tools/pidpersec.py'
+        master, slave = pty.openpty()
+        p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE,
+                             stdout=slave, stderr=subprocess.STDOUT)
+        while True:
+            output = os.read(master, 1024).decode('utf-8')
+            if output == '':
+                break
+            outputList = output[:-1].split()
+            if (outputList[0][2] == ':'):
+                time = outputList[0][:-1]
+                num = outputList[2]
+                data = (time, num)
+                print(time + ": Executing pidPerSec(): ", end='')
+                sqlStr = "INSERT INTO pidPerSec (time, num) VALUES (%s, %s);"
+                self.cursor.execute(sqlStr, data)
+                self.db.commit()
+                print(self.cursor.rowcount, "record inserted.")
 
 if __name__ == '__main__':
     os.setuid(0)
@@ -349,6 +390,12 @@ if __name__ == '__main__':
 
     # tcpLifeProcess = multiprocessing.Process(target=myHandler.tcpLife)
     # tcpLifeProcess.start()
+
+    # runQSlowerProcess = multiprocessing.Process(target=myHandler.runQSlower)
+    # runQSlowerProcess.start()
+
+    pidPerSecProcess = multiprocessing.Process(target=myHandler.pidPerSec)
+    pidPerSecProcess.start()
 
     # while (True):
     #     myHandler.processCount()
