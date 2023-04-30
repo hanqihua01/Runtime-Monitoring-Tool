@@ -22,7 +22,7 @@ export default {
                 notMerge: true,
                 title: {
                     left: '1%',
-                    text: "新创建的进程数量",//标题文本，支持使用 \n 换行。
+                    text: "新创建的进程数量",
                 },
                 tooltip: {
                     trigger: 'axis'
@@ -36,23 +36,23 @@ export default {
                 },
                 toolbox: {
                     feature: {
-                        magicType: {  //设置动态类型切换
+                        magicType: {
                             title: {
                                 line: '折线图',
                                 bar: '柱状图'
                             },
                             type: ['line', 'bar']
                         },
-                        saveAsImage: {} //保存为图片
+                        saveAsImage: {}
                     }
                 },
                 xAxis: {
                     type: 'category',
                     boundaryGap: true,
                     axisTick: {
-                        alignWithLabel: true //保证刻度线和标签对齐
+                        alignWithLabel: true
                     },
-                    data: this.xLabels //x坐标的名称
+                    data: this.xLabels
                 },
                 yAxis: {
                     type: 'value',
@@ -60,25 +60,24 @@ export default {
                 },
                 series: [{
                     name: '新创建的进程数量',
-                    type: 'line', //折线图line;柱形图bar;饼图pie
-                    smooth: true, // 平滑曲线
+                    type: 'line',
+                    smooth: true,
                     areaStyle: {
-                        //显示区域颜色---渐变效果
                         color: {
                             type: 'linear',
                             x: 0, y: 0, x2: 0, y2: 1,
                             colorStops: [{
-                                offset: 0, color: 'rgb(255,200,213)' // 0% 处的颜色
+                                offset: 0, color: 'rgb(255,200,213)'
                             }, {
-                                offset: 1, color: '#ffffff' // 100% 处的颜色
+                                offset: 1, color: '#ffffff'
                             }],
-                            global: false // 缺省为 false
+                            global: false
                         }
                     },
                     itemStyle: {
-                        color: 'rgb(255,96,64)', //改变折线点的颜色
+                        color: 'rgb(255,96,64)',
                         lineStyle: {
-                            color: 'rgb(255,96,64)', //改变折线颜色
+                            color: 'rgb(255,96,64)',
                         }
                     },
                     data: this.data
@@ -111,7 +110,7 @@ export default {
             this.initEcharts()
         })
         getInfo()
-        setInterval(getInfo, 1000)
+        setInterval(getInfo, 1000 * 10)
     }
 }
 </script>

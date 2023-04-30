@@ -22,6 +22,7 @@ import tcpConnLat from '../views/network/tcpConnLat'
 import tcpLife from '../views/network/tcpLife'
 import runQSlower from '../views/process/runQSlower'
 import pidPerSec from '../views/process/pidPerSec'
+import openSnoop from '../views/disk/openSnoop'
 
 Vue.use(VueRouter)
 
@@ -103,6 +104,11 @@ const routes = [
         path: '/DiskUsage',
         name: '磁盘空间占用',
         component: DiskUsage
+      },
+      {
+        path: '/openSnoop',
+        name: '打开文件信息',
+        component: openSnoop
       }
     ]
   },

@@ -190,7 +190,7 @@ export default {
         this.$nextTick(function () {
             this.drawLine('cpuLoad')
         })
-        setInterval(this.getInfo, 1000 * 5)
+        setInterval(this.getInfo, 1000 * 10)
     }
 }
 </script>

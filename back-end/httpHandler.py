@@ -1,6 +1,5 @@
 import os
 import json
-import time
 import pymysql
 import subprocess
 from http.server import BaseHTTPRequestHandler
@@ -349,6 +348,23 @@ class MyHandler(BaseHTTPRequestHandler):
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
                 cursor.execute("SELECT time, num FROM pidPerSec ORDER BY time DESC LIMIT 20;")
+                data = cursor.fetchall()
+                self.wfile.write(json.dumps(data).encode())
+                self.wfile.flush()
+            except subprocess.CalledProcessError as e:
+                self.send_error(500, message=str(e))
+
+        # 打开的文件
+        elif self.path == '/openSnoop':
+            if os.getuid() != 0:
+                self.send_error(401, message='Permission denied')
+                return
+            try:
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                cursor.execute("SELECT curTime, pid, comm, fd, err, path FROM openSnoop ORDER BY curTime DESC LIMIT 20;")
                 data = cursor.fetchall()
                 self.wfile.write(json.dumps(data).encode())
                 self.wfile.flush()
