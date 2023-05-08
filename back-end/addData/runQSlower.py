@@ -22,9 +22,9 @@ while True:
     if (0 < len(outputList) and 2 < len(outputList[0]) and outputList[0][2] == ':'):
         curTime = time.strftime(
             '%Y-%m-%d %H:%M:%S', time.localtime())
-        comm = outputList[1]
-        tid = outputList[2]
-        lat = outputList[3]
+        comm = outputList[1:-2]
+        tid = outputList[-2]
+        lat = outputList[-1]
         data = (curTime, comm, tid, lat)
         sqlStr = "INSERT INTO runQSlower (time, comm, tid, lat) VALUES (%s, %s, %s, %s);"
         cursor.execute(sqlStr, data)

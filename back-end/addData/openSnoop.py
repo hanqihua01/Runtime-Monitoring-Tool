@@ -14,7 +14,7 @@ master, slave = pty.openpty()
 p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE,
                         stdout=slave, stderr=subprocess.STDOUT)
 while True:
-    output = os.read(master, 1024).decode('utf-8')
+    output = os.read(master, 128).decode('utf-8')
     if output == '':
         break
     outputList = output[:-2].split()
@@ -30,6 +30,7 @@ while True:
         sqlStr = "INSERT INTO openSnoop (curTime, pid, comm, fd, err, path) VALUES (%s, %s, %s, %s, %s, %s);"
         cursor.execute(sqlStr, data)
         db.commit()
+        time.sleep(5)
 
 cursor.close()
 db.close()

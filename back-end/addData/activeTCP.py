@@ -24,6 +24,8 @@ while True:
                 '%Y-%m-%d %H:%M:%S', time.localtime())
             pid = outputList[0]
             comm = ' '.join(outputList[1:-4])
+            if len(comm) >= 250:
+                continue
             ip = outputList[-4]
             saddr = outputList[-3]
             daddr = outputList[-2]

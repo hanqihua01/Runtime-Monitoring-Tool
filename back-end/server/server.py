@@ -1,6 +1,5 @@
 import os
 from http.server import HTTPServer
-# 自定义包
 from httpHandler import MyHandler
 
 if __name__ == '__main__':

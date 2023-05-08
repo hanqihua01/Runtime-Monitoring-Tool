@@ -24,6 +24,8 @@ while True:
                 '%Y-%m-%d %H:%M:%S', time.localtime())
             pid = outputList[0]
             comm = ' '.join(outputList[1:-5])
+            if len(comm) >= 250:
+                continue
             ip = outputList[-5]
             raddr = outputList[-4]
             rport = outputList[-3]

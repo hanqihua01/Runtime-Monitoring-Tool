@@ -1,7 +1,6 @@
 import os
 import time
 import pymysql
-import subprocess
 
 os.setuid(0)
 
@@ -12,10 +11,9 @@ cursor = db.cursor()
 # 进程计数
 def processCount():
     cmdStr = "/usr/local/nagios/libexec/check_procs -w 250 -c 400"
-    processNum = subprocess.Popen(
-        [cmdStr], stdout=subprocess.PIPE, shell=True).stdout.readline().split()[2].decode()
+    processNum = os.popen(cmdStr).readline().split()[2]
     curTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    # 将获得的数据插入数据库
+
     sqlStr = "INSERT INTO processCount (processNum, curTime) VALUES (%s, %s);"
     data = (processNum, curTime)
     cursor.execute(sqlStr, data)
@@ -24,10 +22,9 @@ def processCount():
 # cpu负载
 def cpuPercentage():
     cmdStr = "/usr/local/nagios/libexec/check_procs -w 250 -c 400 -m CPU"
-    percentageNum = str(float(subprocess.Popen(
-        [cmdStr], stdout=subprocess.PIPE, shell=True).stdout.readline().decode().split('=')[4][:-2]) / 10)
+    percentageNum = str(float(os.popen(cmdStr).readline().split('=')[4][:-2]) / 10)
     curTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    # 将获得的数据插入数据库
+
     sqlStr = "INSERT INTO cpuPercentage (percentageNum, curTime) VALUES (%s, %s);"
     data = (percentageNum, curTime)
     cursor.execute(sqlStr, data)
@@ -36,9 +33,9 @@ def cpuPercentage():
 # 常驻存储大小
 def residentMemorySize():
     cmdStr = "/usr/local/nagios/libexec/check_procs -w 250 -c 400 -m RSS"
-    sizeNum = subprocess.Popen([cmdStr], stdout=subprocess.PIPE,
-                                shell=True).stdout.readline().decode().split('=')[4][:-2]
+    sizeNum = os.popen(cmdStr).readline().split('=')[4][:-2]
     curTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+
     sqlStr = "INSERT INTO residentMemorySize (sizeNum, curTime) VALUES (%s, %s);"
     data = (sizeNum, curTime)
     cursor.execute(sqlStr, data)
@@ -47,9 +44,9 @@ def residentMemorySize():
 # 虚拟内存大小
 def virtualMemorySize():
     cmdStr = "/usr/local/nagios/libexec/check_procs -w 250 -c 400 -m VSZ"
-    sizeNum = subprocess.Popen([cmdStr], stdout=subprocess.PIPE,
-                                shell=True).stdout.readline().decode().split('=')[4][:-2]
+    sizeNum = os.popen(cmdStr).readline().split('=')[4][:-2]
     curTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+
     sqlStr = "INSERT INTO virtualMemorySize (sizeNum, curTime) VALUES (%s, %s);"
     data = (sizeNum, curTime)
     cursor.execute(sqlStr, data)
@@ -58,13 +55,13 @@ def virtualMemorySize():
 # James状态
 def jamesStatus():
     cmdStr = '/home/hanqihua/james-server-app-3.6.2-app/james-server-app-3.6.2/bin/james status'
-    stdout = subprocess.Popen(
-        [cmdStr], stdout=subprocess.PIPE, shell=True).stdout.readline().decode()
+    stdout = os.popen(cmdStr).readline()
     status = stdout.split()[7]
     port = stdout.split()[8][1:-2]
     if (status == 'not'):
         port = '-1'
     curTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+
     sqlStr = "INSERT INTO jamesStatus (status, port, curTime) VALUES (%s, %s, %s);"
     data = (status, port, curTime)
     cursor.execute(sqlStr, data)
@@ -73,14 +70,14 @@ def jamesStatus():
 # SMTP状态
 def smtpStatus():
     cmdStr = '/usr/local/nagios/libexec/check_smtp -H localhost -p 25'
-    stdout = subprocess.Popen(
-        [cmdStr], stdout=subprocess.PIPE, shell=True).stdout.readline().decode()
+    stdout = os.popen(cmdStr).readline()
     status = stdout.split()[1]
     resTime = stdout.split()[3]
     if (status != 'OK'):
         status = 'CRITICAL'
         resTime = '0.000'
     curTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+
     sqlStr = "INSERT INTO smtpStatus (status, resTime, curTime) VALUES (%s, %s, %s);"
     data = (status, resTime, curTime)
     cursor.execute(sqlStr, data)
@@ -89,14 +86,14 @@ def smtpStatus():
 # POP状态
 def popStatus():
     cmdStr = '/usr/local/nagios/libexec/check_pop -H localhost -p 110'
-    stdout = subprocess.Popen(
-        [cmdStr], stdout=subprocess.PIPE, shell=True).stdout.readline().decode()
+    stdout = os.popen(cmdStr).readline()
     status = stdout.split()[1]
     resTime = stdout.split()[3]
     if (status != 'OK'):
         status = 'CRITICAL'
         resTime = '0.000'
     curTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+
     sqlStr = "INSERT INTO popStatus (status, resTime, curTime) VALUES (%s, %s, %s);"
     data = (status, resTime, curTime)
     cursor.execute(sqlStr, data)
@@ -105,14 +102,14 @@ def popStatus():
 # IMAP状态
 def imapStatus():
     cmdStr = '/usr/local/nagios/libexec/check_imap -H localhost -p 143'
-    stdout = subprocess.Popen(
-        [cmdStr], stdout=subprocess.PIPE, shell=True).stdout.readline().decode()
+    stdout = os.popen(cmdStr).readline()
     status = stdout.split()[1]
     resTime = stdout.split()[3]
     if (status != 'OK'):
         status = 'CRITICAL'
         resTime = '0.000'
     curTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+
     sqlStr = "INSERT INTO imapStatus (status, resTime, curTime) VALUES (%s, %s, %s);"
     data = (status, resTime, curTime)
     cursor.execute(sqlStr, data)
@@ -128,7 +125,7 @@ while (True):
     smtpStatus()
     popStatus()
     imapStatus()
-    time.sleep(5)
+    time.sleep(30)
 
 cursor.close()
 db.close()
