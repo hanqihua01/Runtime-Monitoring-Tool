@@ -80,12 +80,6 @@ export default {
                 tooltip: {
                     trigger: 'axis'
                 },
-                // legend: {
-                //     align: 'right',//文字在前图标在后
-                //     left: '1%',
-                //     top: '10%',
-                //     data: ['CPU负载']
-                // },
                 grid: {
                     top: '15%',
                     left: '1%',

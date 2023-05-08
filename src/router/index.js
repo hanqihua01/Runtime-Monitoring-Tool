@@ -13,7 +13,6 @@ import SMTP from '../views/email/SMTP.vue'
 import POP from '../views/email/POP.vue'
 import IMAP from '../views/email/IMAP.vue'
 import DiskUsage from '../views/disk/diskUsage.vue'
-import FaultDiagnosisFind from '../views/FaultDiagnosis/FaultDiagnosisFind.vue'
 import activeTCP from '../views/network/activeTCP.vue'
 import passiveTCP from '../views/network/passiveTCP.vue'
 import ThreadSnoop from '../views/process/ThreadSnoop.vue'
@@ -169,21 +168,7 @@ const routes = [
         component: IMAP
       }
     ]
-  },
-  {
-    show: true,
-    name: '故障诊断',
-    path: '/',
-    component: IndexView,
-    redirect: '/home',
-    children: [
-      {
-        path: '/FaultDiagnosisFind',
-        name: '故障日志定位',
-        component: FaultDiagnosisFind
-      }
-    ]
-  },
+  }
 ]
 
 const router = new VueRouter({
