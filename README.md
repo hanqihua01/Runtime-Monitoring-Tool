@@ -1,19 +1,13 @@
-# test
+# Runtime Monitoring Tool
+This is a runtime-monitoring tool for distributed systems, using eBPF (especially BCC) and Nagios to collect data, and MTL to conduct runtime verification.
 
-## Project setup
-```
-npm install
-```
+### I need your help! This tool still has some imperfections.
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+# Run backend
+1. Open `back-end` folder.
+2. Run `sudo python3 server/server.py` to activate the backend server.
+3. Run `sudo ./run.sh` to activate data-collecting program, which will create several processes in the background, collecting system data, and store it in MySQL. Just check `ps` to see these processes.
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+# Run frontend
+1. Run `npm run serve` to enter develop mode.
+2. Run `npm run build` to build the project.
