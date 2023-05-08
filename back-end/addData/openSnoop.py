@@ -21,9 +21,15 @@ while True:
     if (len(outputList) == 5 and outputList[0].isdigit()):
         curTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
         pid = outputList[0]
+        if (pid.isdigit() == False):
+            continue
         commList = outputList[1:-3]
         comm = ' '.join(commList)
+        if (comm.isdigit() == True):
+            continue
         fd = outputList[-3]
+        if (fd.isdigit() == False):
+            continue
         err = outputList[-2]
         path = outputList[-1]
         data = (curTime, pid, comm, fd, err, path)
