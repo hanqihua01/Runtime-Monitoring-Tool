@@ -1,4 +1,5 @@
 import os
+import mtl
 import json
 import pymysql
 from http.server import BaseHTTPRequestHandler
@@ -238,7 +239,7 @@ class MyHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
-            cursor.execute("SELECT time, comm, tid, lat FROM runQSlower ORDER BY time DESC LIMIT 20;")
+            cursor.execute("SELECT time, comm, tid, lat FROM runQSlower ORDER BY time DESC LIMIT 10;")
             data = cursor.fetchall()
             self.wfile.write(json.dumps(data).encode())
             self.wfile.flush()
@@ -249,7 +250,7 @@ class MyHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
-            cursor.execute("SELECT time, num FROM pidPerSec ORDER BY time DESC LIMIT 20;")
+            cursor.execute("SELECT time, num FROM pidPerSec ORDER BY time DESC LIMIT 10;")
             data = cursor.fetchall()
             self.wfile.write(json.dumps(data).encode())
             self.wfile.flush()
@@ -260,10 +261,50 @@ class MyHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
-            cursor.execute("SELECT curTime, pid, comm, fd, err, path FROM openSnoop ORDER BY curTime DESC LIMIT 20;")
+            cursor.execute("SELECT curTime, pid, comm, fd, err, path FROM openSnoop ORDER BY curTime DESC LIMIT 10;")
             data = cursor.fetchall()
             self.wfile.write(json.dumps(data).encode())
             self.wfile.flush()
 
         cursor.close()
         db.close()
+
+    # 处理跨域问题
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'POST')
+        self.send_header('Access-Control-Allow-Headers', 'content-type')
+        self.end_headers()
+
+    def do_POST(self):
+        # 连接数据库
+        db = pymysql.connect(host="localhost", user="root", password="123", database="graduate-design")
+        cursor = db.cursor()
+
+        if self.path == '/mtlPidPerSec':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length).decode('utf-8')
+            mtlSpecific = json.loads(post_data)["mtl"]
+
+            self.send_response(200)
+            self.send_header('Content-type', 'text/plain')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+
+            cursor.execute("SELECT num FROM pidPerSec ORDER BY time DESC LIMIT 10;")
+            numList = list(cursor.fetchall())[::-1]
+            aList = []
+            for i in range(len(numList)):
+                if (int(numList[i][0]) > 5): # 每秒新建进程数量大于5为True
+                    aList.append((i, True))
+                else:
+                    aList.append((i, False))
+            data = {
+                'a': aList,
+            }
+            # 在整个时间轴上，如果某个时刻新建进程数量大于5，那么在接下来的2个时间点，新建进程数量不能都大于5
+            phi = mtl.parse(mtlSpecific)
+            data = str(phi(data, quantitative=False))
+            self.wfile.write(data.encode())
+            self.wfile.flush()
