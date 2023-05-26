@@ -304,7 +304,38 @@ class MyHandler(BaseHTTPRequestHandler):
                 'a': aList,
             }
             # 在整个时间轴上，如果某个时刻新建进程数量大于5，那么在接下来的2个时间点，新建进程数量不能都大于5
-            phi = mtl.parse(mtlSpecific)
-            data = str(phi(data, quantitative=False))
+            try:
+                phi = mtl.parse(mtlSpecific)
+                data = str(phi(data, quantitative=False))
+            except:
+                data = "Wrong"
+            self.wfile.write(data.encode())
+            self.wfile.flush()
+
+        if self.path == '/mtlCpuPercentage':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length).decode('utf-8')
+            mtlSpecific = json.loads(post_data)["mtl"]
+
+            self.send_response(200)
+            self.send_header('Content-type', 'text/plain')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            cursor.execute("SELECT percentageNum FROM cpuPercentage ORDER BY curTime DESC LIMIT 10;")
+            numList = list(cursor.fetchall())[::-1]
+            aList = []
+            for i in range(len(numList)):
+                if (float(numList[i][0]) > 60):
+                    aList.append((i, True))
+                else:
+                    aList.append((i, False))
+            data = {
+                'a': aList,
+            }
+            try:
+                phi = mtl.parse(mtlSpecific)
+                data = str(phi(data, quantitative=False))
+            except:
+                data = "Wrong"
             self.wfile.write(data.encode())
             self.wfile.flush()

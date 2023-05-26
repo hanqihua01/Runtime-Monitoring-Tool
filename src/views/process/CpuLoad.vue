@@ -1,5 +1,8 @@
 <template>
     <div>
+        <h1>运行时验证程序监控中：{{ mtlSentence }}</h1>
+        <input type="text" v-model="inputText">
+        <button @click="handleButtonClick">提交</button>
         <el-container>
             <div class="echart" id="loadchart" :style="LoadChartStyle"></div>
         </el-container>
@@ -25,7 +28,11 @@ export default {
             charts: '', // 图
             option: '', // 图的设置
             opinionData: [],//数据
-            xLabels: []
+            xLabels: [],
+
+            mtlSentence: '',
+            mtlSpecific: '',
+            inputText: 'G(a -> (F[1, 6] ~a))'
         }
     },
     mounted() {
@@ -41,7 +48,7 @@ export default {
                 },
                 toolbox: {
                     feature: {
-                        saveAsImage: {} 
+                        saveAsImage: {}
                     }
                 },
                 xAxis: {
@@ -154,6 +161,10 @@ export default {
             if (this.charts != '' && this.option != '') {
                 this.charts.setOption(this.option)
             }
+        },
+        handleButtonClick() {
+            this.mtlSpecific = this.inputText
+            this.mtlSentence = "请等待MTL验证"
         }
     },
     created() {
@@ -176,6 +187,23 @@ export default {
                 .catch(error => {
                     console.log(error)
                 })
+
+            if (_this.mtlSpecific === '') {
+                _this.mtlSentence = "请输入MTL规约"
+            } else {
+                axios.post('http://localhost:3000/mtlCpuPercentage', { mtl: _this.mtlSpecific })
+                .then(response => {
+                    const resStr = response.data
+                    if (resStr === 'True') {
+                        _this.mtlSentence = "根据MTL验证，当前系统运行状态未违反规约"
+                    }
+                    else if (resStr === 'False') {
+                        _this.mtlSentence = "根据MTL验证：当前系统运行状态违反规约"
+                    } else {
+                        _this.mtlSentence = "MTL规约错误"
+                    }
+                })
+            }
         }
         getInfo()
         setInterval(getInfo, 1000 * 3)

@@ -2,7 +2,7 @@
     <div>
         <h1>运行时验证程序监控中：{{ mtlSentence }}</h1>
         <input type="text" v-model="inputText">
-        <button @click="handleButtonClick">Submit</button>
+        <button @click="handleButtonClick">提交</button>
         <div id="pidPerSec" style="width: 100%; height: 520px;"></div>
     </div>
 </template>
