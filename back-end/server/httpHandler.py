@@ -5,8 +5,15 @@ import pymysql
 from http.server import BaseHTTPRequestHandler
 
 class MyHandler(BaseHTTPRequestHandler):
+    # 处理跨域问题
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'POST')
+        self.send_header('Access-Control-Allow-Headers', 'content-type')
+        self.end_headers()
+
     def do_GET(self):
-        # 连接数据库
         db = pymysql.connect(host="localhost", user="root", password="123", database="graduate-design")
         cursor = db.cursor()
 
@@ -269,16 +276,7 @@ class MyHandler(BaseHTTPRequestHandler):
         cursor.close()
         db.close()
 
-    # 处理跨域问题
-    def do_OPTIONS(self):
-        self.send_response(200)
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'POST')
-        self.send_header('Access-Control-Allow-Headers', 'content-type')
-        self.end_headers()
-
     def do_POST(self):
-        # 连接数据库
         db = pymysql.connect(host="localhost", user="root", password="123", database="graduate-design")
         cursor = db.cursor()
 
@@ -339,3 +337,6 @@ class MyHandler(BaseHTTPRequestHandler):
                 data = "Wrong"
             self.wfile.write(data.encode())
             self.wfile.flush()
+
+        cursor.close()
+        db.close()

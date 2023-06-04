@@ -125,7 +125,7 @@ while (True):
     smtpStatus()
     popStatus()
     imapStatus()
-    time.sleep(30)
+    time.sleep(60)
 
 cursor.close()
 db.close()

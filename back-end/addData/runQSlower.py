@@ -27,8 +27,11 @@ while True:
         lat = outputList[-1]
         data = (curTime, comm, tid, lat)
         sqlStr = "INSERT INTO runQSlower (time, comm, tid, lat) VALUES (%s, %s, %s, %s);"
-        cursor.execute(sqlStr, data)
-        db.commit()
+        try:
+            cursor.execute(sqlStr, data)
+            db.commit()
+        except:
+            continue
 
 cursor.close()
 db.close()

@@ -158,7 +158,7 @@ export default {
             this.initEcharts()
         })
         getInfo()
-        setInterval(getInfo, 1000 * 10)
+        setInterval(getInfo, 1000 * 60)
     }
 }
 </script>

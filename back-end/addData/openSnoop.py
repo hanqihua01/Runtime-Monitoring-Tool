@@ -34,8 +34,11 @@ while True:
         path = outputList[-1]
         data = (curTime, pid, comm, fd, err, path)
         sqlStr = "INSERT INTO openSnoop (curTime, pid, comm, fd, err, path) VALUES (%s, %s, %s, %s, %s, %s);"
-        cursor.execute(sqlStr, data)
-        db.commit()
+        try:
+            cursor.execute(sqlStr, data)
+            db.commit()
+        except:
+            continue
         time.sleep(5)
 
 cursor.close()

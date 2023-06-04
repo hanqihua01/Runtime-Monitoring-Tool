@@ -36,8 +36,11 @@ while True:
         lat = outputList[-1]
         data = (curTime, pid, comm, ip, saddr, daddr, dport, lat)
         sqlStr = "INSERT INTO tcpConnLat (curTime, pid, comm, ip, saddr, daddr, dport, lat) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
-        cursor.execute(sqlStr, data)
-        db.commit()
+        try:
+            cursor.execute(sqlStr, data)
+            db.commit()
+        except:
+            continue
 
 cursor.close()
 db.close()

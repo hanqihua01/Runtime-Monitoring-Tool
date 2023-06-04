@@ -39,8 +39,11 @@ while True:
         data = (curTime, pid, comm, laddr,
                 lport, raddr, rport, tx, rx, ms)
         sqlStr = "INSERT INTO tcpLife (curTime, pid, comm, laddr, lport, raddr, rport, tx, rx, ms) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
-        cursor.execute(sqlStr, data)
-        db.commit()
+        try:
+            cursor.execute(sqlStr, data)
+            db.commit()
+        except:
+            continue
 
 cursor.close()
 db.close()

@@ -32,8 +32,11 @@ while True:
             port = outputList[-1]
             sqlStr = "INSERT INTO activeTCP (curTime, pid, comm, ip, saddr, daddr, port) VALUES (%s, %s, %s, %s, %s, %s, %s);"
             data = (curTime, pid, comm, ip, saddr, daddr, port)
-            cursor.execute(sqlStr, data)
-            db.commit()
+            try:
+                cursor.execute(sqlStr, data)
+                db.commit()
+            except:
+                continue
 
 cursor.close()
 db.close()

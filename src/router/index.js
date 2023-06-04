@@ -142,16 +142,7 @@ const routes = [
         path: '/tcpClose',
         name: 'TCP断开连接',
         component: tcpClose
-      }
-    ]
-  },
-  {
-    show: true,
-    name: '邮箱状态',
-    path: '/',
-    component: IndexView,
-    redirect: '/home',
-    children: [
+      },
       {
         path: '/SMTP',
         name: 'SMTP状态',
@@ -168,7 +159,31 @@ const routes = [
         component: IMAP
       }
     ]
-  }
+  },
+  // {
+  //   show: true,
+  //   name: '邮箱状态',
+  //   path: '/',
+  //   component: IndexView,
+  //   redirect: '/home',
+  //   children: [
+  //     {
+  //       path: '/SMTP',
+  //       name: 'SMTP状态',
+  //       component: SMTP
+  //     },
+  //     {
+  //       path: '/POP',
+  //       name: 'POP状态',
+  //       component: POP
+  //     },
+  //     {
+  //       path: '/IMAP',
+  //       name: 'IMAP状态',
+  //       component: IMAP
+  //     }
+  //   ]
+  // }
 ]
 
 const router = new VueRouter({

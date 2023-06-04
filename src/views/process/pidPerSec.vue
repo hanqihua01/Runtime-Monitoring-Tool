@@ -17,7 +17,7 @@ export default {
             myChart: '',
             data: [],
             xLabels: [],
-            mtlSentence: '',
+            mtlSentence: '请输入MTL规约',
             mtlSpecific: '',
             inputText: 'G(a -> ~(G[1, 2] a))'
         }
@@ -91,6 +91,18 @@ export default {
         handleButtonClick() {
             this.mtlSpecific = this.inputText
             this.mtlSentence = "请等待MTL验证"
+            axios.post('http://localhost:3000/mtlPidPerSec', { mtl: this.mtlSpecific })
+                .then(response => {
+                    const resStr = response.data
+                    if (resStr === 'True') {
+                        this.mtlSentence = "根据MTL验证，当前系统运行状态未违反规约"
+                    }
+                    else if (resStr === 'False') {
+                        this.mtlSentence = "根据MTL验证：当前系统运行状态违反规约"
+                    } else {
+                        this.mtlSentence = "MTL规约错误"
+                    }
+                })
         }
     },
     created() {
@@ -112,40 +124,40 @@ export default {
                     }
                 })
 
-            if (_this.mtlSpecific === '') {
-                _this.mtlSentence = "请输入MTL规约"
-            } else {
-                // axios.get('http://localhost:3000/mtlPidPerSec')
-                //     .then(response => {
-                //         const resStr = response.data
-                //         if (resStr === 'True') {
-                //             _this.mtlSentence = "根据MTL验证，当前系统运行状态未违反规约"
-                //         }
-                //         else if (resStr === 'False') {
-                //             _this.mtlSentence = "根据MTL验证：当前系统运行状态违反规约"
-                //         } else {
-                //             _this.mtlSentence = "MTL规约错误"
-                //         }
-                //     })
-                axios.post('http://localhost:3000/mtlPidPerSec', { mtl: _this.mtlSpecific })
-                .then(response => {
-                    const resStr = response.data
-                    if (resStr === 'True') {
-                        _this.mtlSentence = "根据MTL验证，当前系统运行状态未违反规约"
-                    }
-                    else if (resStr === 'False') {
-                        _this.mtlSentence = "根据MTL验证：当前系统运行状态违反规约"
-                    } else {
-                        _this.mtlSentence = "MTL规约错误"
-                    }
-                })
-            }
+            // if (_this.mtlSpecific === '') {
+            //     _this.mtlSentence = "请输入MTL规约"
+            // } else {
+            //     // axios.get('http://localhost:3000/mtlPidPerSec')
+            //     //     .then(response => {
+            //     //         const resStr = response.data
+            //     //         if (resStr === 'True') {
+            //     //             _this.mtlSentence = "根据MTL验证，当前系统运行状态未违反规约"
+            //     //         }
+            //     //         else if (resStr === 'False') {
+            //     //             _this.mtlSentence = "根据MTL验证：当前系统运行状态违反规约"
+            //     //         } else {
+            //     //             _this.mtlSentence = "MTL规约错误"
+            //     //         }
+            //     //     })
+            //     axios.post('http://localhost:3000/mtlPidPerSec', { mtl: _this.mtlSpecific })
+            //     .then(response => {
+            //         const resStr = response.data
+            //         if (resStr === 'True') {
+            //             _this.mtlSentence = "根据MTL验证，当前系统运行状态未违反规约"
+            //         }
+            //         else if (resStr === 'False') {
+            //             _this.mtlSentence = "根据MTL验证：当前系统运行状态违反规约"
+            //         } else {
+            //             _this.mtlSentence = "MTL规约错误"
+            //         }
+            //     })
+            // }
         }
         this.$nextTick(function () {
             this.initEcharts()
         })
         getInfo()
-        setInterval(getInfo, 1000 * 10)
+        setInterval(getInfo, 1000)
     }
 }
 </script>

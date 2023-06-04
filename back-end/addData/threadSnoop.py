@@ -30,7 +30,7 @@ while True:
         data = (curTime, pid, comm, func)
         cursor.execute(sqlStr, data)
         db.commit()
-        time.sleep(2)
+        time.sleep(5)
 
 cursor.close()
 db.close()

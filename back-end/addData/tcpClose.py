@@ -36,8 +36,11 @@ while True:
         dport = outputList[-1]
         data = (curTime, pid, comm, ip, saddr, daddr, sport, dport)
         sqlStr = "INSERT INTO tcpClose (curTime, pid, comm, ip, saddr, daddr, sport, dport) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
-        cursor.execute(sqlStr, data)
-        db.commit()
+        try:
+            cursor.execute(sqlStr, data)
+            db.commit()
+        except:
+            continue
 
 cursor.close()
 db.close()

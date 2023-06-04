@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>TCP连接延迟：</h1>
+        <h1>TCP数据大小与时长：</h1>
         <el-table :data="tableData" style="width: 100%" stripe>
             <el-table-column prop="curTime" label="时间" sortable>
             </el-table-column>
@@ -69,7 +69,7 @@ export default {
                 })
         }
         getInfo()
-        setInterval(getInfo, 1000 * 10)
+        setInterval(getInfo, 1000 * 5)
     }
 }
 </script>
