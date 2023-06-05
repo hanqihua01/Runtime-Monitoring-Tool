@@ -21,8 +21,8 @@ def processCount():
 
 # cpu负载
 def cpuPercentage():
-    cmdStr = "/usr/local/nagios/libexec/check_procs -w 250 -c 400 -m CPU"
-    percentageNum = str(float(os.popen(cmdStr).readline().split('=')[4][:-2]) / 10)
+    cmdStr = "/usr/local/nagios/libexec/check_load -w 0.3,0.5,0.7 -c 0.5,0.7,0.9"
+    percentageNum = os.popen(cmdStr).readline().split('|')[0].split(':')[1].split(',')[0].strip()
     curTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
     sqlStr = "INSERT INTO cpuPercentage (percentageNum, curTime) VALUES (%s, %s);"

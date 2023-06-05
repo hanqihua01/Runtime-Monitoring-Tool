@@ -299,7 +299,7 @@ class MyHandler(BaseHTTPRequestHandler):
                 else:
                     aList.append((i, False))
             data = {
-                'a': aList,
+                'newProcs': aList,
             }
             # 在整个时间轴上，如果某个时刻新建进程数量大于5，那么在接下来的2个时间点，新建进程数量不能都大于5
             try:
@@ -320,15 +320,15 @@ class MyHandler(BaseHTTPRequestHandler):
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
             cursor.execute("SELECT percentageNum FROM cpuPercentage ORDER BY curTime DESC LIMIT 10;")
-            numList = list(cursor.fetchall())[::-1]
+            numList = list(cursor.fetchall())[::-1] # 按时间正序排列
             aList = []
             for i in range(len(numList)):
-                if (float(numList[i][0]) > 60):
+                if (float(numList[i][0]) > 0.6):
                     aList.append((i, True))
                 else:
                     aList.append((i, False))
             data = {
-                'a': aList,
+                'cpuLoad': aList,
             }
             try:
                 phi = mtl.parse(mtlSpecific)

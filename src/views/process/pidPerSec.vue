@@ -19,7 +19,7 @@ export default {
             xLabels: [],
             mtlSentence: '请输入MTL规约',
             mtlSpecific: '',
-            inputText: 'G(a -> ~(G[1, 2] a))'
+            inputText: 'G(newProcs -> ~(G[1, 2] newProcs))'
         }
     },
     methods: {

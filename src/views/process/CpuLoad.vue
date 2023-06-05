@@ -32,7 +32,7 @@ export default {
 
             mtlSentence: '请输入MTL规约',
             mtlSpecific: '',
-            inputText: 'G(a -> (F[1, 6] ~a))'
+            inputText: 'G(cpuLoad -> (F[1, 6] ~cpuLoad))'
         }
     },
     mounted() {
