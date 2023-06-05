@@ -1,5 +1,8 @@
 <template>
     <div>
+        <h1>运行时验证程序监控中：{{ mtlSentence }}</h1>
+        <input type="text" v-model="inputText">
+        <button @click="handleButtonClick">提交</button>
         <div>
             <div>
                 <h1>当前CPU占用：</h1>
@@ -82,7 +85,11 @@ export default {
                     value: 0,
                     name: "CRITICAL"
                 }
-            ]
+            ],
+
+            mtlSentence: '请输入MTL规约',
+            mtlSpecific: '',
+            inputText: 'G(procNum -> (F[1, 9] ~procNum))'
         };
     },
     methods: {
@@ -135,6 +142,22 @@ export default {
                 myChart.resize();
             });
         },
+        handleButtonClick() {
+            this.mtlSpecific = this.inputText
+            this.mtlSentence = "请等待MTL验证"
+            axios.post('http://localhost:3000/mtlProcessCount', { mtl: this.mtlSpecific })
+                .then(response => {
+                    const resStr = response.data
+                    if (resStr === 'True') {
+                        this.mtlSentence = "根据MTL验证，当前系统运行状态未违反规约"
+                    }
+                    else if (resStr === 'False') {
+                        this.mtlSentence = "根据MTL验证：当前系统运行状态违反规约"
+                    } else {
+                        this.mtlSentence = "MTL规约错误"
+                    }
+                })
+        }
     },
     created() {
         const _this = this

@@ -310,7 +310,7 @@ class MyHandler(BaseHTTPRequestHandler):
             self.wfile.write(data.encode())
             self.wfile.flush()
 
-        if self.path == '/mtlCpuPercentage':
+        elif self.path == '/mtlCpuPercentage':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length).decode('utf-8')
             mtlSpecific = json.loads(post_data)["mtl"]
@@ -329,6 +329,34 @@ class MyHandler(BaseHTTPRequestHandler):
                     aList.append((i, False))
             data = {
                 'cpuLoad': aList,
+            }
+            try:
+                phi = mtl.parse(mtlSpecific)
+                data = str(phi(data, quantitative=False))
+            except:
+                data = "Wrong"
+            self.wfile.write(data.encode())
+            self.wfile.flush()
+
+        elif self.path == '/mtlProcessCount':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length).decode('utf-8')
+            mtlSpecific = json.loads(post_data)["mtl"]
+
+            self.send_response(200)
+            self.send_header('Content-type', 'text/plain')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            cursor.execute("SELECT processNum FROM processCount ORDER BY curTime DESC LIMIT 10;")
+            numList = list(cursor.fetchall())[::-1] # 按时间正序排列
+            aList = []
+            for i in range(len(numList)):
+                if (float(numList[i][0]) > 350):
+                    aList.append((i, True))
+                else:
+                    aList.append((i, False))
+            data = {
+                'procNum': aList,
             }
             try:
                 phi = mtl.parse(mtlSpecific)
